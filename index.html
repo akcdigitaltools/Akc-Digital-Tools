@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Calculator Tool</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --light: #f5f7fa;
+            --dark: #333;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .calculator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section, .results-section {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .macro-ratios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ratio-item {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .ratio-item.active {
+            background-color: #e7f1ff;
+            border: 2px solid var(--primary);
+        }
+
+        .ratio-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .ratio-item p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .results-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .macro-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .macro-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .macro-card.carbs {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        }
+
+        .macro-card.protein {
+            background: linear-gradient(135deg, #2196F3, #03A9F4);
+        }
+
+        .macro-card.fat {
+            background: linear-gradient(135deg, #FF9800, #FFC107);
+        }
+
+        .macro-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .macro-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .macro-grams {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .calorie-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .calorie-summary h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .calorie-total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .explanation {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .explanation h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .explanation p {
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Macro Calculator</h1>
+            <p class="subtitle">Calculate your optimal daily macronutrient intake</p>
+        </header>
+
+        <div class="calculator-container">
+            <div class="input-section">
+                <h2>Your Information</h2>
+                <form id="macro-form">
+                    <div class="form-group">
+                        <label for="calorie-goal">Daily Calorie Goal</label>
+                        <input type="number" id="calorie-goal" min="500" max="10000" value="2000" required>
+                        <div class="error" id="calorie-error">Please enter a valid calorie goal (500-10000)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="diet-type">Diet Type</label>
+                        <select id="diet-type">
+                            <option value="balanced">Balanced</option>
+                            <option value="low-carb">Low Carb</option>
+                            <option value="high-carb">High Carb</option>
+                            <option value="keto">Keto</option>
+                            <option value="high-protein">High Protein</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="protein-ratio">Protein Ratio (%)</label>
+                        <div class="slider-container">
+                            <input type="range" id="protein-ratio" min="10" max="40" value="25">
+                            <span class="slider-value" id="protein-value">25%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fat-ratio">Fat Ratio (%)</label>
+                        <div class="slider-container">
+                            <input type="range" id="fat-ratio" min="15" max="45" value="30">
+                            <span class="slider-value" id="fat-value">30%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Carb Ratio: <span id="carb-value">45%</span></label>
+                        <p style="font-size: 0.9rem; color: #666;">Carb ratio is calculated automatically based on protein and fat ratios.</p>
+                    </div>
+
+                    <button type="button" id="calculate-btn" class="btn">Calculate My Macros</button>
+                </form>
+            </div>
+
+            <div class="results-section">
+                <h2>Your Daily Macros</h2>
+                <div class="calorie-summary">
+                    <h3>Total Calories</h3>
+                    <div class="calorie-total" id="total-calories">2000</div>
+                    <p>Based on your inputs</p>
+                </div>
+
+                <div class="macro-results">
+                    <div class="macro-card carbs">
+                        <h3>Carbohydrates</h3>
+                        <div class="macro-value" id="carbs-calories">900</div>
+                        <div class="macro-grams" id="carbs-grams">225g</div>
+                        <p>45% of total calories</p>
+                    </div>
+
+                    <div class="macro-card protein">
+                        <h3>Protein</h3>
+                        <div class="macro-value" id="protein-calories">500</div>
+                        <div class="macro-grams" id="protein-grams">125g</div>
+                        <p>25% of total calories</p>
+                    </div>
+
+                    <div class="macro-card fat">
+                        <h3>Fat</h3>
+                        <div class="macro-value" id="fat-calories">600</div>
+                        <div class="macro-grams" id="fat-grams">67g</div>
+                        <p>30% of total calories</p>
+                    </div>
+                </div>
+
+                <div class="explanation">
+                    <h3>Understanding Your Macros</h3>
+                    <p><strong>Carbohydrates:</strong> Your body's primary energy source. Important for brain function and physical activity.</p>
+                    <p><strong>Protein:</strong> Essential for muscle repair, immune function, and creating enzymes and hormones.</p>
+                    <p><strong>Fat:</strong> Necessary for hormone production, nutrient absorption, and providing energy.</p>
+                    <p>Adjust the ratios based on your fitness goals, activity level, and dietary preferences.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Note: This calculator provides general recommendations. Consult a healthcare professional for personalized advice.</p>
+            <p>Macro Calculator &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const calorieGoalInput = document.getElementById('calorie-goal');
+            const dietTypeSelect = document.getElementById('diet-type');
+            const proteinRatioSlider = document.getElementById('protein-ratio');
+            const fatRatioSlider = document.getElementById('fat-ratio');
+            const proteinValueDisplay = document.getElementById('protein-value');
+            const fatValueDisplay = document.getElementById('fat-value');
+            const carbValueDisplay = document.getElementById('carb-value');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const calorieError = document.getElementById('calorie-error');
+            
+            // Result elements
+            const totalCaloriesDisplay = document.getElementById('total-calories');
+            const carbsCaloriesDisplay = document.getElementById('carbs-calories');
+            const carbsGramsDisplay = document.getElementById('carbs-grams');
+            const proteinCaloriesDisplay = document.getElementById('protein-calories');
+            const proteinGramsDisplay = document.getElementById('protein-grams');
+            const fatCaloriesDisplay = document.getElementById('fat-calories');
+            const fatGramsDisplay = document.getElementById('fat-grams');
+            
+            // Set up diet type presets
+            const dietPresets = {
+                'balanced': { protein: 25, fat: 30 }, // carbs: 45
+                'low-carb': { protein: 30, fat: 40 }, // carbs: 30
+                'high-carb': { protein: 20, fat: 25 }, // carbs: 55
+                'keto': { protein: 20, fat: 70 }, // carbs: 10
+                'high-protein': { protein: 35, fat: 25 } // carbs: 40
+            };
+            
+            // Update ratios when diet type changes
+            dietTypeSelect.addEventListener('change', function() {
+                const preset = dietPresets[this.value];
+                proteinRatioSlider.value = preset.protein;
+                fatRatioSlider.value = preset.fat;
+                updateRatioDisplays();
+                calculateMacros();
+            });
+            
+            // Update ratio displays when sliders change
+            proteinRatioSlider.addEventListener('input', updateRatioDisplays);
+            fatRatioSlider.addEventListener('input', updateRatioDisplays);
+            
+            // Calculate macros when button is clicked
+            calculateBtn.addEventListener('click', calculateMacros);
+            
+            // Validate calorie input
+            calorieGoalInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (isNaN(value) || value < 500 || value > 10000) {
+                    calorieError.style.display = 'block';
+                    this.style.borderColor = 'var(--danger)';
+                } else {
+                    calorieError.style.display = 'none';
+                    this.style.borderColor = '#ddd';
+                }
+            });
+            
+            // Function to update ratio displays
+            function updateRatioDisplays() {
+                const proteinRatio = parseInt(proteinRatioSlider.value);
+                const fatRatio = parseInt(fatRatioSlider.value);
+                const carbRatio = 100 - proteinRatio - fatRatio;
+                
+                proteinValueDisplay.textContent = `${proteinRatio}%`;
+                fatValueDisplay.textContent = `${fatRatio}%`;
+                carbValueDisplay.textContent = `${carbRatio}%`;
+            }
+            
+            // Function to calculate and display macros
+            function calculateMacros() {
+                // Validate inputs
+                const calorieGoal = parseInt(calorieGoalInput.value);
+                if (isNaN(calorieGoal) || calorieGoal < 500 || calorieGoal > 10000) {
+                    calorieError.style.display = 'block';
+                    calorieGoalInput.style.borderColor = 'var(--danger)';
+                    return;
+                }
+                
+                // Get ratios
+                const proteinRatio = parseInt(proteinRatioSlider.value) / 100;
+                const fatRatio = parseInt(fatRatioSlider.value) / 100;
+                const carbRatio = (100 - parseInt(proteinRatioSlider.value) - parseInt(fatRatioSlider.value)) / 100;
+                
+                // Check if ratios are valid
+                if (carbRatio < 0) {
+                    alert('Protein and Fat ratios add up to more than 100%. Please adjust them.');
+                    return;
+                }
+                
+                // Calculate calorie distribution
+                const proteinCalories = Math.round(calorieGoal * proteinRatio);
+                const fatCalories = Math.round(calorieGoal * fatRatio);
+                const carbsCalories = Math.round(calorieGoal * carbRatio);
+                
+                // Calculate grams (4 calories per gram for protein and carbs, 9 for fat)
+                const proteinGrams = Math.round(proteinCalories / 4);
+                const fatGrams = Math.round(fatCalories / 9);
+                const carbsGrams = Math.round(carbsCalories / 4);
+                
+                // Update displays
+                totalCaloriesDisplay.textContent = calorieGoal;
+                proteinCaloriesDisplay.textContent = proteinCalories;
+                proteinGramsDisplay.textContent = `${proteinGrams}g`;
+                fatCaloriesDisplay.textContent = fatCalories;
+                fatGramsDisplay.textContent = `${fatGrams}g`;
+                carbsCaloriesDisplay.textContent = carbsCalories;
+                carbsGramsDisplay.textContent = `${carbsGrams}g`;
+                
+                // Update percentage displays in results
+                document.querySelector('.macro-card.carbs p').textContent = `${Math.round(carbRatio * 100)}% of total calories`;
+                document.querySelector('.macro-card.protein p').textContent = `${Math.round(proteinRatio * 100)}% of total calories`;
+                document.querySelector('.macro-card.fat p').textContent = `${Math.round(fatRatio * 100)}% of total calories`;
+            }
+            
+            // Initialize the calculator with default values
+            updateRatioDisplays();
+            calculateMacros();
+        });
+    </script>
+</body>
+</html>
